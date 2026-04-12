@@ -1,21 +1,12 @@
 "use client";
 import { useEffect, useState, useRef, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { toPng } from 'html-to-image';
-import { QRCodeSVG } from 'qrcode.react';
-
-// --- TIPE DATA ---
-type Registration = { id: string; child_name: string; child_class: string };
-type Seat = {
-  id: string;
-  row_name: string;
-  seat_number: number;
-  is_occupied: boolean;
-  assigned_to: string | null;
-  registrations?: Registration | null;
-};
-type FullRegistration = { id: string; child_name: string; child_class: string; };
+import { Seat, RegistrationData } from '@/types';
+import { TicketMap } from '@/components/ticket/TicketMap';
+import { TicketDetailCard } from '@/components/ticket/TicketDetailCard';
+import { HiddenTicket } from '@/components/shared/HiddenTicket';
 
 export default function TicketPage() {
   return (
@@ -26,20 +17,18 @@ export default function TicketPage() {
 }
 
 function TicketContent() {
-  const router = useRouter(); 
   const searchParams = useSearchParams();
   const regId = searchParams.get('id');
   const ticketRef = useRef<HTMLDivElement>(null);
 
   const [mySeats, setMySeats] = useState<Seat[]>([]);
   const [allSeats, setAllSeats] = useState<Seat[]>([]);
-  const [studentData, setStudentData] = useState<FullRegistration | null>(null);
-  const [baseUrl, setBaseUrl] = useState('');
+  const [studentData, setStudentData] = useState<RegistrationData | null>(null);
+
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
   useEffect(() => {
     const fetchData = async () => {
-      if (typeof window !== 'undefined') setBaseUrl(window.location.origin);
-      
       if (regId) {
         const { data: reg } = await supabase.from('registrations').select('*').eq('id', regId).maybeSingle();
         if (reg) setStudentData(reg);
@@ -65,25 +54,12 @@ function TicketContent() {
     } catch (err) { console.error("Gagal download:", err); }
   };
 
-  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
-
-  const getSeatColorClass = (row: string, isMine: boolean, isTaken: boolean) => {
-    if (isMine) return 'bg-[#5d4037] text-white shadow-lg shadow-[#3e2723]/40 z-10 scale-110 ring-2 ring-offset-2 ring-[#a1887f] border-none'; 
-    if (isTaken) return 'bg-[#d7ccc8] text-[#a1887f] cursor-not-allowed border border-[#bcaaa4]'; 
-    if (row === 'A') return 'bg-green-100 text-green-800 border border-green-300 hover:bg-green-200'; 
-    if (row === 'B' || row === 'C') return 'bg-pink-100 text-pink-800 border border-pink-300 hover:bg-pink-200'; 
-    return 'bg-blue-50 text-blue-800 border border-blue-200 hover:bg-blue-100'; 
-  };
-
   return (
     <div 
       className="min-h-screen text-[#3e2723] p-4 md:p-6 pb-40 font-sans relative overflow-x-hidden" 
       style={{ 
         backgroundImage: "url('/Background.png')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-        backgroundRepeat: 'no-repeat'
+        backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', backgroundRepeat: 'no-repeat'
       }}
     >
       <div className="absolute inset-0 bg-[#3e2723]/5 pointer-events-none"></div>
@@ -103,86 +79,14 @@ function TicketContent() {
          <div className="flex items-center gap-2 bg-white/80 px-3 py-1 rounded-full shadow-sm"><div className="w-3 h-3 bg-blue-100 border border-blue-400 rounded-full"></div><span className="text-[10px] font-bold text-blue-800 uppercase">Umum (D-L)</span></div>
       </div>
 
-      {/* MAP */}
-      <div className="max-w-5xl mx-auto overflow-hidden rounded-3xl bg-[#fff8e1]/90 backdrop-blur-sm border border-[#d7ccc8] shadow-xl mb-12 relative z-10 animate-fade-in-up delay-100">
-        <div className="md:hidden bg-[#d7ccc8] text-[#5d4037] text-[10px] font-bold text-center py-2 flex items-center justify-center gap-2">
-           <span>↔️</span> Geser ke samping untuk melihat posisi
-        </div>
-        <div className="overflow-x-auto p-0 md:p-10 custom-scrollbar relative">
-          <div style={{ minWidth: 'max-content' }} className="text-center mx-auto p-6">
-            <div className="mb-10 md:mb-14 relative mx-auto md:w-2/3!" style={{ width: '600px' }}>
-               <div className="absolute inset-0 bg-[#8d6e63]/20 blur-3xl rounded-full"></div>
-               <div className="h-12 md:h-16 rounded-b-[80px] md:rounded-b-[100px] shadow-xl shadow-[#3e2723]/20 flex items-center justify-center relative z-10 border-t-4 border-[#a1887f]" style={{ background: 'linear-gradient(to bottom, #8d6e63, #5d4037)' }}>
-                  <span className="text-[10px] font-black tracking-[0.4em] text-[#efebe9] uppercase mt-2">Panggung Utama</span>
-               </div>
-            </div>
-            <div className="space-y-3 md:space-y-4">
-              {rows.map((rowName) => {
-                const seatsInRow = allSeats.filter(s => s.row_name === rowName);
-                const halfIndex = Math.floor(seatsInRow.length / 2);
-                return (
-                  <div key={rowName} className="flex justify-center items-center gap-2 md:gap-3">
-                    <div className="sticky left-0 z-20 bg-[#fff8e1]/95 backdrop-blur px-2 md:px-3 py-1 rounded-r-lg shadow-sm border-r border-[#d7ccc8] font-black text-[#a1887f] text-xs md:text-sm w-8 md:w-10 shrink-0">{rowName}</div>
-                    {seatsInRow.map((seat, index) => {
-                      const isMine = seat.assigned_to === regId;
-                      const isTaken = seat.is_occupied && !isMine;
-                      const isAisle = index === halfIndex; 
-                      const colorClass = getSeatColorClass(rowName, isMine, isTaken);
-                      return (
-                        <div key={seat.id} className={`${isAisle ? 'ml-12 md:ml-20' : ''} w-8 h-8 md:w-10 md:h-10 text-[9px] md:text-xs shrink-0 flex items-center justify-center font-bold transition-all duration-300 rounded-lg md:rounded-xl shadow-sm ${colorClass}`}>
-                          {seat.seat_number}
-                        </div>
-                      );
-                    })}
-                    <div className="sticky right-0 z-20 bg-[#fff8e1]/95 backdrop-blur px-2 md:px-3 py-1 rounded-l-lg shadow-sm border-l border-[#d7ccc8] font-black text-[#a1887f] text-xs md:text-sm w-8 md:w-10 shrink-0">{rowName}</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
+      <TicketMap allSeats={allSeats} regId={regId} />
 
-      {/* DETAIL TIKET & TOMBOL KEMBALI */}
       {regId && (
-        <div className="max-w-md mx-auto rounded-3xl overflow-hidden shadow-2xl shadow-[#3e2723]/10 border border-[#d7ccc8] mb-16 relative z-10 animate-fade-in-up delay-200">
-           <div className="absolute inset-0 bg-[#fff8e1]"></div> 
-          <div className="p-6 text-center relative overflow-hidden bg-[#5d4037]">
-             <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>
-             <h3 className="text-[#efebe9] font-bold text-lg relative z-10">Tiket Anda</h3>
-             <p className="text-[#d7ccc8] text-xs relative z-10">Silakan unduh tiket terbaru jika ada perubahan</p>
-          </div>
-          <div className="p-8 relative">
-            <div className="flex justify-between items-center border-b border-[#d7ccc8] pb-5 mb-5">
-                <div>
-                    <p className="text-[10px] text-[#8d6e63] font-bold uppercase tracking-wider mb-1">Nama Siswa</p>
-                    <p className="text-lg font-black text-[#3e2723] capitalize">{studentData?.child_name}</p>
-                </div>
-                <div className="text-right">
-                    <p className="text-[10px] text-[#8d6e63] font-bold uppercase tracking-wider mb-1">Kelas</p>
-                    <p className="text-lg font-black text-[#5d4037]">{studentData?.child_class}</p>
-                </div>
-            </div>
-            <div className="bg-[#efebe9] p-5 rounded-2xl flex justify-between items-center mb-8 border border-[#d7ccc8]">
-                <span className="font-bold text-[#5d4037] text-sm">Nomor Kursi</span>
-                <span className="text-3xl font-black text-[#3e2723] tracking-tight">{mySeats.map(s => `${s.row_name}-${s.seat_number}`).join(" & ")}</span>
-            </div>
-            
-            <div className="flex flex-col gap-3">
-                <button onClick={downloadUpdatedTicket} className="w-full py-4 bg-linear-to-r from-[#6d4c41] to-[#3e2723] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 group">
-                <span className="group-hover:animate-bounce">📥</span> Download E-Ticket
-                </button>
-
-                <button 
-                    onClick={() => router.push('/')} 
-                    className="w-full py-4 bg-[#fff8e1] text-[#5d4037] font-bold rounded-xl border-2 border-[#5d4037] hover:bg-[#d7ccc8] transition-all active:scale-95"
-                >
-                    🏠 Kembali ke Menu Utama
-                </button>
-            </div>
-
-          </div>
-        </div>
+        <TicketDetailCard 
+          studentData={studentData} 
+          mySeats={mySeats} 
+          onDownload={downloadUpdatedTicket} 
+        />
       )}
 
       {/* LEGEND BOTTOM */}
@@ -191,64 +95,17 @@ function TicketContent() {
          <div className="flex items-center gap-2"><div className="w-3 h-3 bg-[#d7ccc8] rounded-full"></div><span className="text-[10px] font-bold text-[#a1887f] uppercase">Terisi</span></div>
       </div>
 
-      {/* --- HIDDEN TICKET (Untuk Download) --- */}
-      <div className="absolute -z-50 opacity-0 pointer-events-none top-0 left-0">
-        <div ref={ticketRef} style={{ width: '600px', padding: '20px', fontFamily: 'sans-serif' }}>
-          <div style={{ position: 'relative', display: 'flex', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 30px 60px rgba(0,0,0,0.5)', border: '4px solid #5d4037' }}>
-            
-            {/* Disable linting for img tag */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img 
-                src="/Background.png" 
-                alt="Ticket Background"
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    zIndex: 0
-                }}
-            />
-
-            <div style={{ flex: 1, padding: '40px', position: 'relative', zIndex: 10, borderRight: '3px dashed #5d4037' }}>
-               <div style={{ position: 'relative', zIndex: 1 }}>
-                  <p style={{ fontSize: '14px', fontWeight: 800, color: '#5d4037', letterSpacing: '4px', marginBottom: '10px', textShadow: '1px 1px 0 #fff' }}>ADMISSION TICKET</p>
-                  <h1 style={{ fontSize: '42px', fontWeight: 900, color: '#3e2723', lineHeight: 1, margin: '0 0 40px 0', textShadow: '2px 2px 0px rgba(255,255,255,0.8)' }}>PENTAS SENI<br/>2026</h1>
-                  <div style={{ marginBottom: '30px' }}>
-                    <p style={{ fontSize: '12px', fontWeight: 700, color: '#8d6e63', textTransform: 'uppercase', marginBottom: '5px', textShadow: '1px 1px 0 #fff' }}>Guest Name</p>
-                    <p style={{ fontSize: '32px', fontWeight: 900, color: '#3e2723', textTransform: 'capitalize', textShadow: '1px 1px 0 #fff' }}>{studentData?.child_name}</p>
-                  </div>
-                  <div style={{ display: 'flex', gap: '40px' }}>
-                    <div>
-                      <p style={{ fontSize: '11px', fontWeight: 700, color: '#8d6e63', textTransform: 'uppercase', textShadow: '1px 1px 0 #fff' }}>Class</p>
-                      <p style={{ fontSize: '20px', fontWeight: 900, color: '#3e2723', textShadow: '1px 1px 0 #fff' }}>{studentData?.child_class}</p>
-                    </div>
-                    <div>
-                      <p style={{ fontSize: '11px', fontWeight: 700, color: '#8d6e63', textTransform: 'uppercase', textShadow: '1px 1px 0 #fff' }}>Hall</p>
-                      <p style={{ fontSize: '20px', fontWeight: 900, color: '#3e2723', textShadow: '1px 1px 0 #fff' }}>AUDITORIUM</p>
-                    </div>
-                  </div>
-               </div>
-            </div>
-            
-            <div style={{ width: '200px', background: '#5d4037', padding: '40px 20px', color: '#efebe9', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', borderLeft: '3px dashed #8d6e63', position: 'relative', zIndex: 10 }}>
-               <div style={{ textAlign: 'center', width: '100%' }}>
-                  <p style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '2px', marginBottom: '10px', color: '#d7ccc8' }}>SEAT NO.</p>
-                  <h2 style={{ fontSize: '32px', fontWeight: 900, lineHeight: 1.1, margin: 0, color: '#ffffff' }}>
-                      {mySeats.map(s => `${s.row_name}-${s.seat_number}`).join("/")}
-                  </h2>
-               </div>
-               <div style={{ background: '#fff8e1', padding: '10px', borderRadius: '16px' }}>
-                  {regId && baseUrl && <QRCodeSVG value={`${baseUrl}/ticket?id=${regId}`} size={100} level={"H"} fgColor="#3e2723" bgColor="#fff8e1" />}
-               </div>
-               <p style={{ fontSize: '10px', fontWeight: 700, opacity: 0.8, textAlign: 'center', color: '#d7ccc8' }}>TK AISYIYAH 21<br/>RAWAMANGUN</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      {/* HIDDEN TICKET (Untuk Download - Reusable Component) */}
+      {regId && studentData && (
+        <HiddenTicket 
+          ref={ticketRef}
+          childName={studentData.child_name}
+          childClass={studentData.child_class}
+          seats={mySeats.map(s => `${s.row_name}-${s.seat_number}`)}
+          regId={regId}
+          baseUrl={baseUrl}
+        />
+      )}
     </div>
   );
 }
