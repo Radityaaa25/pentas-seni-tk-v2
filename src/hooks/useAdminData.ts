@@ -37,7 +37,6 @@ export const useAdminData = (isAuthenticated: boolean) => {
         .select("*")
         .order("child_name", { ascending: true });
 
-      // FIX UTAMA: Tambahin urutan saat ngambil data kursi dari database
       const { data: seatData, error: seatError } = await supabase
         .from("seats")
         .select("*")
@@ -115,14 +114,33 @@ export const useAdminData = (isAuthenticated: boolean) => {
     }
   };
 
+  // FITUR BARU: Cuma nyabut kursi, tanpa ngehapus nama siswa
+  const executeResetSeat = async (regId: string, onSuccess: () => void) => {
+    try {
+      await supabase
+        .from("seats")
+        .update({ is_occupied: false, assigned_to: null })
+        .eq("assigned_to", regId);
+      showToast("Kursi berhasil dikosongkan!", "success");
+      fetchData();
+      onSuccess();
+    } catch (error) {
+      showToast("Gagal mengosongkan kursi.", "error");
+    }
+  };
+
   const handleSaveEdit = async (
-    editData: { id: string; name: string; class: string },
+    editData: { id: string; name: string; nickname: string; class: string },
     onSuccess: () => void,
   ) => {
     try {
       await supabase
         .from("registrations")
-        .update({ child_name: editData.name, child_class: editData.class })
+        .update({
+          child_name: editData.name,
+          child_nickname: editData.nickname,
+          child_class: editData.class,
+        })
         .eq("id", editData.id);
       showToast("Data diperbarui!", "success");
       fetchData();
@@ -133,7 +151,7 @@ export const useAdminData = (isAuthenticated: boolean) => {
   };
 
   const handleManualAdd = async (
-    addData: { name: string; class: string },
+    addData: { name: string; nickname: string; class: string },
     onSuccess: () => void,
   ) => {
     if (!addData.name) {
@@ -172,6 +190,7 @@ export const useAdminData = (isAuthenticated: boolean) => {
           {
             parent_name: "-",
             child_name: addData.name,
+            child_nickname: addData.nickname,
             child_class: addData.class,
           },
         ])
@@ -202,6 +221,7 @@ export const useAdminData = (isAuthenticated: boolean) => {
     fetchData,
     toggleBlock,
     executeDelete,
+    executeResetSeat,
     handleSaveEdit,
     handleManualAdd,
   };

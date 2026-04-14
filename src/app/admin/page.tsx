@@ -20,13 +20,26 @@ export default function AdminPage() {
   const [editData, setEditData] = useState<{
     id: string;
     name: string;
+    nickname: string;
     class: string;
   } | null>(null);
-  const [addData, setAddData] = useState<{ name: string; class: string }>({
+  const [addData, setAddData] = useState<{
+    name: string;
+    nickname: string;
+    class: string;
+  }>({
     name: "",
+    nickname: "",
     class: "KB B1",
   });
+
   const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    regId: string | null;
+  }>({ isOpen: false, regId: null });
+
+  // Modal buat Reset Kursi
+  const [resetModal, setResetModal] = useState<{
     isOpen: boolean;
     regId: string | null;
   }>({ isOpen: false, regId: null });
@@ -41,6 +54,7 @@ export default function AdminPage() {
     fetchData,
     toggleBlock,
     executeDelete,
+    executeResetSeat,
     handleSaveEdit,
     handleManualAdd,
   } = useAdminData(isAuthenticated);
@@ -89,10 +103,11 @@ export default function AdminPage() {
         />
       )}
 
+      {/* Modal Hapus Permanen */}
       <ConfirmModal
         isOpen={deleteModal.isOpen}
         title="Hapus Peserta?"
-        message="Aksi ini akan menghapus peserta dan mengosongkan kursi mereka."
+        message="Aksi ini akan menghapus peserta secara permanen dan mengosongkan kursi mereka."
         onConfirm={() =>
           executeDelete(deleteModal.regId!, () =>
             setDeleteModal({ isOpen: false, regId: null }),
@@ -101,13 +116,25 @@ export default function AdminPage() {
         onCancel={() => setDeleteModal({ isOpen: false, regId: null })}
       />
 
+      {/* Modal Reset Kursi */}
+      <ConfirmModal
+        isOpen={resetModal.isOpen}
+        title="Kosongkan Kursi Siswa?"
+        message="Aksi ini akan mencabut tiket/kursi dari siswa ini, TAPI nama siswa akan tetap aman di database (status kembali menjadi Belum Hadir)."
+        onConfirm={() =>
+          executeResetSeat(resetModal.regId!, () =>
+            setResetModal({ isOpen: false, regId: null }),
+          )
+        }
+        onCancel={() => setResetModal({ isOpen: false, regId: null })}
+      />
+
       <AdminSidebar
         activeView={activeView}
         setActiveView={setActiveView}
         onLogout={() => setIsAuthenticated(false)}
       />
 
-      {/* GARA-GARA GUE NGAPUS "overflow-hidden" DI BAWAH INI SEMUANYA JADI HANCUR. SEKARANG UDAH GUE BALIKIN */}
       <main className="flex-1 md:ml-72 p-8 overflow-hidden">
         <div className="md:hidden mb-6 flex justify-between items-center bg-[#fff8e1] p-4 rounded-2xl shadow-md border border-[#d7ccc8]">
           <h1 className="text-xl font-black text-[#3e2723]">Admin Panel</h1>
@@ -172,8 +199,9 @@ export default function AdminPage() {
         ) : (
           <ParticipantsTable
             filteredParticipants={filteredData}
-            onEdit={(id, n, c) => {
-              setEditData({ id, name: n, class: c });
+            onReset={(id) => setResetModal({ isOpen: true, regId: id })}
+            onEdit={(id, n, nick, c) => {
+              setEditData({ id, name: n, nickname: nick, class: c });
               setIsEditModalOpen(true);
             }}
             onDelete={(id) => setDeleteModal({ isOpen: true, regId: id })}
@@ -189,7 +217,7 @@ export default function AdminPage() {
         onAdd={() =>
           handleManualAdd(addData, () => {
             setIsAddModalOpen(false);
-            setAddData({ name: "", class: "KB B1" });
+            setAddData({ name: "", nickname: "", class: "KB B1" });
           })
         }
       />
