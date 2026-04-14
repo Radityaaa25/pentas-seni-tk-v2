@@ -1,6 +1,7 @@
 export type RegistrationData = {
   id: string; 
   child_name: string;
+  child_nickname: string; // Tambahkan ini
   child_class: string;
 };
 

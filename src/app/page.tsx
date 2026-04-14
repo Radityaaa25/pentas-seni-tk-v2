@@ -1,74 +1,73 @@
 "use client";
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { toPng } from 'html-to-image';
-import { IntroAnimation } from '@/components/home/IntroAnimation';
-import { HeaderSection } from '@/components/home/HeaderSection';
-import { MainAuthForm } from '@/components/home/MainAuthForm';
-import { SuccessPopup } from '@/components/home/SuccessPopup';
-import { BottomIllustration } from '@/components/home/BottomIllustration';
-import { HiddenTicket } from '@/components/shared/HiddenTicket';
+import { useState, useRef, useEffect, useCallback } from "react";
+import { toPng } from "html-to-image";
+import { IntroAnimation } from "@/components/home/IntroAnimation";
+import { HeaderSection } from "@/components/home/HeaderSection";
+import { MainAuthForm } from "@/components/home/MainAuthForm";
+import { SuccessPopup } from "@/components/home/SuccessPopup";
+import { BottomIllustration } from "@/components/home/BottomIllustration";
+import { HiddenTicket } from "@/components/shared/HiddenTicket";
 
 export default function Home() {
-  const ticketRef = useRef<HTMLDivElement>(null); 
-  
+  const ticketRef = useRef<HTMLDivElement>(null);
+
   const [showIntro, setShowIntro] = useState(true);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  
-  const [finalSeats, setFinalSeats] = useState<string[]>([]);
-  const [regId, setRegId] = useState<string>('');
-  
-  const [formData, setFormData] = useState({ childName: '', childClass: 'KB B1' });
 
-  // Langsung ambil URL, tidak perlu useEffect atau state karena HiddenTicket 
-  // baru akan di-render di client side setelah pendaftaran berhasil.
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  const [finalSeats, setFinalSeats] = useState<string[]>([]);
+  const [regId, setRegId] = useState<string>("");
+
+  const [formData, setFormData] = useState({
+    childName: "",
+    childClass: "KB B1",
+  });
+
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   const downloadTicketAsImage = useCallback(async () => {
     if (!ticketRef.current) return;
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const dataUrl = await toPng(ticketRef.current, { cacheBust: true, pixelRatio: 3 });
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const dataUrl = await toPng(ticketRef.current, {
+        cacheBust: true,
+        pixelRatio: 3,
+      });
       const link = document.createElement("a");
-      link.download = `VIP-Ticket-${formData.childName || 'Tiket'}.png`; 
+      link.download = `VIP-Ticket-${formData.childName || "Tiket"}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
       console.error("Gagal download:", err);
     }
-  }, [formData.childName]); 
+  }, [formData.childName]);
 
   useEffect(() => {
     if (showSuccessPopup && finalSeats.length > 0) {
-        const timer = setTimeout(() => downloadTicketAsImage(), 1000); 
-        return () => clearTimeout(timer);
+      const timer = setTimeout(() => downloadTicketAsImage(), 1000);
+      return () => clearTimeout(timer);
     }
   }, [showSuccessPopup, finalSeats, downloadTicketAsImage]);
 
   return (
-    <div 
+    <div
       className="min-h-screen flex flex-col items-center justify-center p-4 font-sans relative overflow-x-hidden"
-      style={{ 
+      style={{
         backgroundImage: "url('/Background.png')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+        backgroundRepeat: "no-repeat",
+      }}>
       <div className="absolute inset-0 bg-black/10 pointer-events-none"></div>
 
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
 
       {showSuccessPopup && (
-        <SuccessPopup 
-          finalSeats={finalSeats} 
-          regId={regId} 
-        />
+        <SuccessPopup finalSeats={finalSeats} regId={regId} />
       )}
 
-      {/* Render HiddenTicket HANYA ketika sukses. Bebas error ESLint & Hydration! */}
       {showSuccessPopup && (
-        <HiddenTicket 
+        <HiddenTicket
           ref={ticketRef}
           childName={formData.childName}
           childClass={formData.childClass}
@@ -80,11 +79,10 @@ export default function Home() {
 
       <HeaderSection isHidden={showIntro} />
 
-      <MainAuthForm 
+      <MainAuthForm
         isHidden={showIntro}
-        formData={formData}
-        setFormData={setFormData}
-        onSuccess={(seats, id) => {
+        onSuccess={(seats, id, name, cls) => {
+          setFormData({ childName: name, childClass: cls });
           setFinalSeats(seats);
           setRegId(id);
           setShowSuccessPopup(true);
@@ -93,7 +91,9 @@ export default function Home() {
 
       <BottomIllustration isHidden={showIntro} />
 
-      <div className="fixed bottom-4 text-center w-full text-[#3e2723] text-[10px] font-medium tracking-widest uppercase opacity-80 animate-fade-in-up delay-500 shrink-0" style={{ textShadow: '0px 0px 10px rgba(255,255,255,0.8)' }}>
+      <div
+        className="fixed bottom-4 text-center w-full text-[#3e2723] text-[10px] font-medium tracking-widest uppercase opacity-80 animate-fade-in-up delay-500 shrink-0"
+        style={{ textShadow: "0px 0px 10px rgba(255,255,255,0.8)" }}>
         © 2026 TK Aisyiyah 21 Rawamangun
       </div>
     </div>
