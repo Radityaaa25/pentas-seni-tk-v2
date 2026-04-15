@@ -9,6 +9,8 @@ export type Participant = {
   child_class: string;
   seatNumbers: string[];
   isPresent: boolean;
+  firstSeatRow: string;
+  firstSeatNum: number;
 };
 
 export const useAdminData = (isAuthenticated: boolean) => {
@@ -34,8 +36,7 @@ export const useAdminData = (isAuthenticated: boolean) => {
     try {
       const { data: regs, error: regError } = await supabase
         .from("registrations")
-        .select("*")
-        .order("child_name", { ascending: true });
+        .select("*"); // Diurutkan nanti via Javascript
 
       const { data: seatData, error: seatError } = await supabase
         .from("seats")
@@ -59,7 +60,29 @@ export const useAdminData = (isAuthenticated: boolean) => {
           child_class: reg.child_class,
           seatNumbers: seatLabels,
           isPresent: seatLabels.length > 0,
+          // Menyimpan info kursi pertama buat keperluan sorting
+          firstSeatRow:
+            assignedSeats.length > 0 ? assignedSeats[0].row_name : "ZZ",
+          firstSeatNum:
+            assignedSeats.length > 0 ? assignedSeats[0].seat_number : 9999,
         };
+      });
+
+      // LOGIKA SORTING BARU (Berdasarkan Kursi > Abjad Nama)
+      formattedParticipants.sort((a, b) => {
+        // Jika keduanya sudah hadir (punya kursi), urutkan berdasarkan Baris & Nomor
+        if (a.isPresent && b.isPresent) {
+          if (a.firstSeatRow !== b.firstSeatRow) {
+            return a.firstSeatRow.localeCompare(b.firstSeatRow);
+          }
+          return a.firstSeatNum - b.firstSeatNum;
+        }
+        // Yang punya kursi taruh di atas, yang belum punya di bawah
+        if (a.isPresent && !b.isPresent) return -1;
+        if (!a.isPresent && b.isPresent) return 1;
+
+        // Jika keduanya sama-sama belum hadir, baru urutkan berdasarkan Abjad Nama
+        return a.child_name.localeCompare(b.child_name);
       });
 
       setParticipants(formattedParticipants);
@@ -114,7 +137,6 @@ export const useAdminData = (isAuthenticated: boolean) => {
     }
   };
 
-  // FITUR BARU: Cuma nyabut kursi, tanpa ngehapus nama siswa
   const executeResetSeat = async (regId: string, onSuccess: () => void) => {
     try {
       await supabase

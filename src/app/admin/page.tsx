@@ -190,7 +190,8 @@ export default function AdminPage() {
           )}
         </header>
 
-        {loading ? (
+        {/* PERUBAHAN DISINI: Hanya tunjukkan loading full-screen kalau pesertanya masih KOSONG */}
+        {loading && participants.length === 0 ? (
           <div className="flex justify-center mt-20">
             <div className="w-10 h-10 border-4 border-[#5d4037] border-t-transparent rounded-full animate-spin"></div>
           </div>

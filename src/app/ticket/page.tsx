@@ -64,14 +64,15 @@ function TicketContent() {
   const downloadUpdatedTicket = async () => {
     if (!ticketRef.current) return;
     try {
-      // Menghapus cacheBust: true karena membuat rendering image background blank di iPhone
+      // Trik untuk Safari iOS: Render pertama sering gagal/hitam, jadi kita pancing dulu
+      await toPng(ticketRef.current, { pixelRatio: 1 });
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
       const dataUrl = await toPng(ticketRef.current, { pixelRatio: 3 });
       const link = document.createElement("a");
-      // Mengubah format penamaan file
       link.download = `GOLDEN TICKET (${studentData?.child_name || "Event"}).png`;
       link.href = dataUrl;
 
-      // Trik bypass download blocker di safari iOS
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

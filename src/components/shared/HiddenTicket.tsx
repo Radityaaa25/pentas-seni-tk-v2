@@ -27,9 +27,8 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
             }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/Background.png"
+              src={`${baseUrl}/Background.png`}
               alt="Ticket Background"
-              crossOrigin="anonymous"
               style={{
                 position: "absolute",
                 top: 0,
@@ -142,7 +141,6 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                 </div>
               </div>
             </div>
-            {/* Bagian justify-content sudah diganti menjadi justifyContent */}
             <div
               style={{
                 width: "200px",

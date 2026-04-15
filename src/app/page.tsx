@@ -27,17 +27,20 @@ export default function Home() {
   const downloadTicketAsImage = useCallback(async () => {
     if (!ticketRef.current) return;
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      // Menghapus cacheBust: true untuk memperbaiki masalah blank background di iPhone
+      await new Promise((resolve) => setTimeout(resolve, 800)); // Beri jeda ekstra agar background termuat
+
+      // Trik untuk Safari iOS: Render pertama sering gagal/hitam, jadi kita pancing dulu
+      await toPng(ticketRef.current, { pixelRatio: 1 });
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Render kedua yang sebenarnya untuk di-download
       const dataUrl = await toPng(ticketRef.current, {
         pixelRatio: 3,
       });
       const link = document.createElement("a");
-      // Format nama file menjadi GOLDEN TICKET (NAMA USER)
       link.download = `GOLDEN TICKET (${formData.childName || "Tiket"}).png`;
       link.href = dataUrl;
 
-      // Menambahkan link ke body sementara waktu adalah trik untuk mengatasi pemblokiran auto-download di iPhone
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
