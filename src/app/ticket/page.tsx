@@ -64,11 +64,14 @@ function TicketContent() {
   const downloadUpdatedTicket = async () => {
     if (!ticketRef.current) return;
     try {
-      // Trik untuk Safari iOS: Render pertama sering gagal/hitam, jadi kita pancing dulu
-      await toPng(ticketRef.current, { pixelRatio: 1 });
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const dataUrl = await toPng(ticketRef.current, { pixelRatio: 3 });
+      const dataUrl = await toPng(ticketRef.current, {
+        pixelRatio: 3,
+        backgroundColor: "#fff8e1",
+        cacheBust: true,
+      });
+
       const link = document.createElement("a");
       link.download = `GOLDEN TICKET (${studentData?.child_name || "Event"}).png`;
       link.href = dataUrl;

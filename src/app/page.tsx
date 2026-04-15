@@ -27,16 +27,16 @@ export default function Home() {
   const downloadTicketAsImage = useCallback(async () => {
     if (!ticketRef.current) return;
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800)); // Beri jeda ekstra agar background termuat
+      // Jeda sedikit lebih lama untuk memastikan CSS background termuat
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Trik untuk Safari iOS: Render pertama sering gagal/hitam, jadi kita pancing dulu
-      await toPng(ticketRef.current, { pixelRatio: 1 });
-      await new Promise((resolve) => setTimeout(resolve, 200));
-
-      // Render kedua yang sebenarnya untuk di-download
+      // Menambahkan backgroundColor: '#fff8e1' memastikan hasil PNG tidak transparan
       const dataUrl = await toPng(ticketRef.current, {
         pixelRatio: 3,
+        backgroundColor: "#fff8e1",
+        cacheBust: true, // Diaktifkan kembali dengan backgroundImage agar Safari melakukan refresh asset
       });
+
       const link = document.createElement("a");
       link.download = `GOLDEN TICKET (${formData.childName || "Tiket"}).png`;
       link.href = dataUrl;
