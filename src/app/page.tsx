@@ -28,14 +28,19 @@ export default function Home() {
     if (!ticketRef.current) return;
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
+      // Menghapus cacheBust: true untuk memperbaiki masalah blank background di iPhone
       const dataUrl = await toPng(ticketRef.current, {
-        cacheBust: true,
         pixelRatio: 3,
       });
       const link = document.createElement("a");
-      link.download = `VIP-Ticket-${formData.childName || "Tiket"}.png`;
+      // Format nama file menjadi GOLDEN TICKET (NAMA USER)
+      link.download = `GOLDEN TICKET (${formData.childName || "Tiket"}).png`;
       link.href = dataUrl;
+
+      // Menambahkan link ke body sementara waktu adalah trik untuk mengatasi pemblokiran auto-download di iPhone
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     } catch (err) {
       console.error("Gagal download:", err);
     }

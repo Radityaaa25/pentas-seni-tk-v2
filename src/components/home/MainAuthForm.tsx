@@ -153,7 +153,7 @@ export const MainAuthForm = ({
           backgroundRepeat: "no-repeat",
           filter: "drop-shadow(0 20px 30px rgba(0,0,0,0.25))",
         }}>
-        <div className="absolute top-14 md:top-16 left-1/2 -translate-x-1/2 w-28 md:w-36 rotate-6 z-50 pointer-events-none filter drop-shadow-xl">
+        <div className="absolute top-14 -mt-3 md:top-8 left-1/2 -translate-x-1/2 w-28 md:w-36 rotate-6 z-50 pointer-events-none filter drop-shadow-xl">
           <div className="relative w-full shine-effect rounded-lg overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -164,7 +164,7 @@ export const MainAuthForm = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-center w-full mt-2 md:mt-4 animate-fade-in-up delay-100 shrink-0">
+        <div className="flex items-center justify-center w-full mt-5 md:mt-4 animate-fade-in-up delay-100 shrink-0">
           <div className="bg-[#fff8e1]/80 backdrop-blur-sm border border-[#d7ccc8] text-[#5d4037] px-5 py-2 rounded-full text-xs md:text-sm font-black tracking-wide shadow-sm flex items-center gap-1.5">
             <span>📍</span> 31 Mei 2026, Gd. i3L Pulomas
           </div>
