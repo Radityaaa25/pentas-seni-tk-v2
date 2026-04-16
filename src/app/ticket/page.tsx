@@ -64,14 +64,10 @@ function TicketContent() {
   const downloadUpdatedTicket = async () => {
     if (!ticketRef.current) return;
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       const dataUrl = await toPng(ticketRef.current, {
-        pixelRatio: 3,
-        backgroundColor: "#fff8e1",
         cacheBust: true,
+        pixelRatio: 3,
       });
-
       const link = document.createElement("a");
       link.download = `GOLDEN TICKET (${studentData?.child_name || "Event"}).png`;
       link.href = dataUrl;

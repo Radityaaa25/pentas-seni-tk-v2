@@ -27,16 +27,11 @@ export default function Home() {
   const downloadTicketAsImage = useCallback(async () => {
     if (!ticketRef.current) return;
     try {
-      // Jeda sedikit lebih lama untuk memastikan CSS background termuat
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Menambahkan backgroundColor: '#fff8e1' memastikan hasil PNG tidak transparan
+      await new Promise((resolve) => setTimeout(resolve, 500));
       const dataUrl = await toPng(ticketRef.current, {
+        cacheBust: true,
         pixelRatio: 3,
-        backgroundColor: "#fff8e1",
-        cacheBust: true, // Diaktifkan kembali dengan backgroundImage agar Safari melakukan refresh asset
       });
-
       const link = document.createElement("a");
       link.download = `GOLDEN TICKET (${formData.childName || "Tiket"}).png`;
       link.href = dataUrl;

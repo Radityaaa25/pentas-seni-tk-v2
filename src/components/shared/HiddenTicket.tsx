@@ -12,16 +12,10 @@ type HiddenTicketProps = {
 export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
   ({ childName, childClass, seats, regId, baseUrl }, ref) => {
     return (
-      /* Wrapper diubah agar tetap 'visible' bagi renderer tapi berada di luar layar */
-      <div className="fixed left-[-9999px] top-0 pointer-events-none">
+      <div className="absolute -z-50 opacity-0 pointer-events-none top-0 left-0">
         <div
           ref={ref}
-          style={{
-            width: "600px",
-            padding: "20px",
-            fontFamily: "sans-serif",
-            backgroundColor: "#fff8e1",
-          }}>
+          style={{ width: "600px", padding: "20px", fontFamily: "sans-serif" }}>
           <div
             style={{
               position: "relative",
@@ -30,12 +24,21 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
               overflow: "hidden",
               boxShadow: "0 30px 60px rgba(0,0,0,0.5)",
               border: "4px solid #5d4037",
-              backgroundColor: "#fff8e1", // Fallback warna jika gambar gagal muat
-              backgroundImage: `url('${baseUrl}/Background.png')`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
             }}>
-            {/* Tag img dihapus dan diganti backgroundImage di div atas agar lebih kompatibel dengan iOS */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/Background.png"
+              alt="Ticket Background"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                zIndex: 0,
+              }}
+            />
             <div
               style={{
                 flex: 1,
