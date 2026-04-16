@@ -160,7 +160,6 @@ function TicketContent() {
           childClass={studentData.child_class}
           seats={mySeats.map((s) => `${s.row_name}-${s.seat_number}`)}
           regId={regId}
-          baseUrl={baseUrl}
         />
       )}
     </div>

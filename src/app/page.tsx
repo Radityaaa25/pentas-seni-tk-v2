@@ -80,7 +80,6 @@ export default function Home() {
         childClass={formData.childClass || ""}
         seats={finalSeats.length > 0 ? finalSeats : ["-"]}
         regId={regId || ""}
-        baseUrl={baseUrl}
       />
 
       <HeaderSection isHidden={showIntro} />

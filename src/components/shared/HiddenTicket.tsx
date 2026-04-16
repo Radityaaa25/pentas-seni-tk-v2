@@ -6,11 +6,10 @@ type HiddenTicketProps = {
   childClass: string;
   seats: string[];
   regId: string;
-  baseUrl: string;
 };
 
 export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
-  ({ childName, childClass, seats, regId, baseUrl }, ref) => {
+  ({ childName, childClass, seats, regId }, ref) => {
     return (
       // TRIK KHUSUS IPHONE: Jangan pakai opacity-0. Sembunyikan di tumpukan paling belakang agar tetap dirender sistem
       <div
@@ -29,10 +28,10 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
               border: "4px solid #5d4037",
               backgroundColor: "#fff8e1",
             }}>
-            {/* Menggunakan URL absolut agar html-to-image tidak kehilangan jejak file di iOS */}
+            {/* Menggunakan relative path agar konsisten SSR */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={`${baseUrl}/Background.png`}
+              src="/Background.png"
               alt="Ticket Background"
               crossOrigin="anonymous"
               loading="eager"
@@ -46,6 +45,19 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                 objectFit: "cover",
                 zIndex: 0,
                 display: "block",
+              }}
+            />
+
+            {/* Dark overlay untuk gelap background */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(0, 0, 0, 0.3)",
+                zIndex: 5,
               }}
             />
 
@@ -113,7 +125,8 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                         fontWeight: 700,
                         color: "#8d6e63",
                         textTransform: "uppercase",
-                        textShadow: "1px 1px 0 #fff",
+                        textShadow:
+                          "2px 2px 4px rgba(0, 0, 0, 0.4), 1px 1px 0 #fff",
                       }}>
                       Class
                     </p>
@@ -122,7 +135,8 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                         fontSize: "20px",
                         fontWeight: 900,
                         color: "#3e2723",
-                        textShadow: "1px 1px 0 #fff",
+                        textShadow:
+                          "2px 2px 4px rgba(0, 0, 0, 0.5), 1px 1px 0 #fff",
                       }}>
                       {childClass}
                     </p>
@@ -134,7 +148,8 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                         fontWeight: 700,
                         color: "#8d6e63",
                         textTransform: "uppercase",
-                        textShadow: "1px 1px 0 #fff",
+                        textShadow:
+                          "2px 2px 4px rgba(0, 0, 0, 0.4), 1px 1px 0 #fff",
                       }}>
                       Hall
                     </p>
@@ -143,7 +158,8 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                         fontSize: "20px",
                         fontWeight: 900,
                         color: "#3e2723",
-                        textShadow: "1px 1px 0 #fff",
+                        textShadow:
+                          "2px 2px 4px rgba(0, 0, 0, 0.5), 1px 1px 0 #fff",
                       }}>
                       AUDITORIUM
                     </p>
@@ -193,9 +209,9 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                   padding: "10px",
                   borderRadius: "16px",
                 }}>
-                {regId && baseUrl && (
+                {regId && (
                   <QRCodeSVG
-                    value={`${baseUrl}/ticket?id=${regId}`}
+                    value={`/ticket?id=${regId}`}
                     size={100}
                     level={"H"}
                     fgColor="#3e2723"
