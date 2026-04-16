@@ -35,6 +35,8 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
               src={`${baseUrl}/Background.png`}
               alt="Ticket Background"
               crossOrigin="anonymous"
+              loading="eager"
+              decoding="sync"
               style={{
                 position: "absolute",
                 top: 0,
@@ -43,6 +45,7 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                 height: "100%",
                 objectFit: "cover",
                 zIndex: 0,
+                display: "block",
               }}
             />
 

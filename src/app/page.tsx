@@ -28,6 +28,9 @@ export default function Home() {
   const downloadTicketAsImage = useCallback(async () => {
     if (!ticketRef.current) return;
     try {
+      // Pastikan semua images sudah dimuat sebelum screenshot (khusus untuk iOS)
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       const dataUrl = await toPng(ticketRef.current, {
         cacheBust: true,
         pixelRatio: 3,
