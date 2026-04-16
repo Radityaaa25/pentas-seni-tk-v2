@@ -31,7 +31,7 @@ export const SuccessPopup = ({
           <button
             onClick={onDownload}
             className="w-full text-white font-bold py-3 rounded-xl shadow-md transform transition active:scale-95 hover:brightness-110 cursor-pointer bg-green-600">
-            ⬇️ Unduh Tiket (Manual)
+            ⬇️ Unduh Tiket
           </button>
 
           <button
