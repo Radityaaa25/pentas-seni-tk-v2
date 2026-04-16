@@ -61,10 +61,10 @@ function TicketContent() {
     fetchData();
   }, [regId]);
 
+  // Fungsi manual download normal
   const downloadUpdatedTicket = async () => {
     if (!ticketRef.current) return;
     try {
-      // FULL MURNI SEPERTI AWAL. Gak ada delay/timeout yang bikin Safari error!
       const dataUrl = await toPng(ticketRef.current, {
         cacheBust: true,
         pixelRatio: 3,

@@ -12,7 +12,10 @@ type HiddenTicketProps = {
 export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
   ({ childName, childClass, seats, regId, baseUrl }, ref) => {
     return (
-      <div className="absolute -z-50 opacity-0 pointer-events-none top-0 left-0">
+      // TRIK BARU: Jangan pakai opacity-0. Lempar saja elemennya jauh ke kiri layar.
+      <div
+        className="absolute pointer-events-none"
+        style={{ left: "-9999px", top: "-9999px" }}>
         <div
           ref={ref}
           style={{ width: "600px", padding: "20px", fontFamily: "sans-serif" }}>
@@ -24,11 +27,13 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
               overflow: "hidden",
               boxShadow: "0 30px 60px rgba(0,0,0,0.5)",
               border: "4px solid #5d4037",
+              backgroundColor: "#fff8e1",
             }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/Background.png"
               alt="Ticket Background"
+              crossOrigin="anonymous"
               style={{
                 position: "absolute",
                 top: 0,
@@ -39,6 +44,7 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                 zIndex: 0,
               }}
             />
+
             <div
               style={{
                 flex: 1,

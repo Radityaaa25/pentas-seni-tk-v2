@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { toPng } from "html-to-image";
 import { IntroAnimation } from "@/components/home/IntroAnimation";
 import { HeaderSection } from "@/components/home/HeaderSection";
@@ -10,7 +10,6 @@ import { HiddenTicket } from "@/components/shared/HiddenTicket";
 
 export default function Home() {
   const ticketRef = useRef<HTMLDivElement>(null);
-  const hasDownloaded = useRef(false);
 
   const [showIntro, setShowIntro] = useState(true);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -25,10 +24,10 @@ export default function Home() {
 
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
+  // Fungsi Download Manual
   const downloadTicketAsImage = useCallback(async () => {
-    if (!ticketRef.current || hasDownloaded.current) return;
+    if (!ticketRef.current) return;
     try {
-      // TIDAK ADA LAGI DELAY! Langsung hajar render agar Safari tidak ngambek.
       const dataUrl = await toPng(ticketRef.current, {
         cacheBust: true,
         pixelRatio: 3,
@@ -40,35 +39,11 @@ export default function Home() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      hasDownloaded.current = true;
     } catch (err) {
       console.error("Gagal download:", err);
+      alert("Gagal mengunduh tiket. Silakan coba lagi.");
     }
   }, [formData.childName]);
-
-  // Auto Download normal (Jalan mulus di Android/PC)
-  useEffect(() => {
-    if (showSuccessPopup && finalSeats.length > 0) {
-      hasDownloaded.current = false;
-      const timer = setTimeout(() => {
-        downloadTicketAsImage();
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [showSuccessPopup, finalSeats, downloadTicketAsImage]);
-
-  // Tombol penyelamat iPhone: Memaksa download menggunakan klik fisik dari user
-  const handleActionClick = async () => {
-    if (!hasDownloaded.current) {
-      await downloadTicketAsImage();
-    }
-    if (regId) {
-      setTimeout(() => {
-        window.location.href = `/ticket?id=${regId}`;
-      }, 300);
-    }
-  };
 
   return (
     <div
@@ -84,17 +59,17 @@ export default function Home() {
 
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
 
+      {/* Tampilkan Popup dengan tombol download */}
       {showSuccessPopup && (
         <SuccessPopup
           finalSeats={finalSeats}
           regId={regId}
-          onAction={handleActionClick}
+          onLihatPeta={() => (window.location.href = `/ticket?id=${regId}`)}
+          onDownload={downloadTicketAsImage}
         />
       )}
 
-      {/* !!! KUNCI UTAMA: HiddenTicket dipanggil DILUAR kondisi Sukses !!! 
-          Ini memaksa browser mendownload & menyimpan Background.png ke memori 
-          sejak pertama kali web dibuka. Begitu tombol submit ditekan, gambarnya PASTI ADA. */}
+      {/* Render HiddenTicket di background agar gambarnya siap */}
       <HiddenTicket
         ref={ticketRef}
         childName={formData.childName || ""}
