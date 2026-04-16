@@ -61,7 +61,6 @@ function TicketContent() {
     fetchData();
   }, [regId]);
 
-  // Fungsi manual download normal
   const downloadUpdatedTicket = async () => {
     if (!ticketRef.current) return;
     try {

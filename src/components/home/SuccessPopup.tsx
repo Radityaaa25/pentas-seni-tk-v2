@@ -26,8 +26,8 @@ export const SuccessPopup = ({
           </p>
         </div>
 
-        {/* Tombol Manual Download */}
         <div className="flex flex-col gap-3">
+          {/* Tombol Download Manual */}
           <button
             onClick={onDownload}
             className="w-full text-white font-bold py-3 rounded-xl shadow-md transform transition active:scale-95 hover:brightness-110 cursor-pointer bg-green-600">

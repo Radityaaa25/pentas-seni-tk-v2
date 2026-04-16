@@ -12,10 +12,10 @@ type HiddenTicketProps = {
 export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
   ({ childName, childClass, seats, regId, baseUrl }, ref) => {
     return (
-      // TRIK BARU: Jangan pakai opacity-0. Lempar saja elemennya jauh ke kiri layar.
+      // TRIK KHUSUS IPHONE: Jangan pakai opacity-0. Sembunyikan di tumpukan paling belakang agar tetap dirender sistem
       <div
-        className="absolute pointer-events-none"
-        style={{ left: "-9999px", top: "-9999px" }}>
+        className="fixed top-0 left-0 pointer-events-none"
+        style={{ zIndex: -9999 }}>
         <div
           ref={ref}
           style={{ width: "600px", padding: "20px", fontFamily: "sans-serif" }}>
@@ -29,9 +29,10 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
               border: "4px solid #5d4037",
               backgroundColor: "#fff8e1",
             }}>
+            {/* Menggunakan URL absolut agar html-to-image tidak kehilangan jejak file di iOS */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/Background.png"
+              src={`${baseUrl}/Background.png`}
               alt="Ticket Background"
               crossOrigin="anonymous"
               style={{

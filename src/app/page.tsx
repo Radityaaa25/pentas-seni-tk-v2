@@ -24,7 +24,7 @@ export default function Home() {
 
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
-  // Fungsi Download Manual
+  // Fungsi Download Manual (Tidak ada delay, murni dari klik user)
   const downloadTicketAsImage = useCallback(async () => {
     if (!ticketRef.current) return;
     try {
@@ -55,11 +55,12 @@ export default function Home() {
         backgroundAttachment: "fixed",
         backgroundRepeat: "no-repeat",
       }}>
-      <div className="absolute inset-0 bg-black/10 pointer-events-none"></div>
+      <div
+        className="absolute inset-0 bg-black/10 pointer-events-none"
+        style={{ zIndex: -100 }}></div>
 
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
 
-      {/* Tampilkan Popup dengan tombol download */}
       {showSuccessPopup && (
         <SuccessPopup
           finalSeats={finalSeats}
@@ -69,7 +70,7 @@ export default function Home() {
         />
       )}
 
-      {/* Render HiddenTicket di background agar gambarnya siap */}
+      {/* HiddenTicket DITAMPILKAN TERUS agar Background.png punya waktu untuk loading! */}
       <HiddenTicket
         ref={ticketRef}
         childName={formData.childName || ""}
