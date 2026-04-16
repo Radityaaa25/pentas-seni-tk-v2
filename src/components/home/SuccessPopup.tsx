@@ -1,9 +1,11 @@
 export const SuccessPopup = ({
   finalSeats,
   regId,
+  onLihatPeta,
 }: {
   finalSeats: string[];
   regId: string;
+  onLihatPeta?: () => void;
 }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in-up">
@@ -13,7 +15,7 @@ export const SuccessPopup = ({
           Pendaftaran Berhasil!
         </h2>
         <p className="text-[#8d6e63] mb-6 font-medium text-sm">
-          Tiket sedang didownload...
+          Tiket sedang diproses...
         </p>
         <div className="bg-[#efebe9] p-6 rounded-2xl mb-6 border border-[#d7ccc8]">
           <p className="text-xs text-[#5d4037] uppercase font-bold tracking-widest mb-1">
@@ -25,16 +27,19 @@ export const SuccessPopup = ({
         </div>
         <button
           onClick={() =>
-            regId
-              ? (window.location.href = `/ticket?id=${regId}`)
-              : alert("ID tidak ditemukan. Silakan refresh.")
+            onLihatPeta
+              ? onLihatPeta()
+              : regId
+                ? (window.location.href = `/ticket?id=${regId}`)
+                : alert("ID tidak ditemukan.")
           }
           className="w-full text-white font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95 hover:brightness-110 cursor-pointer"
           style={{ background: "linear-gradient(to right, #8d6e63, #5d4037)" }}>
           Lihat Peta Lokasi 🗺️
         </button>
-        <p className="mt-4 text-xs font-bold text-[#5d4037]">
-          Selamat tiket anda akan otomatis terdowload
+        {/* REQUEST 1: Penambahan teks peringatan */}
+        <p className="mt-4 text-[10px] font-black text-[#8d6e63] uppercase tracking-widest">
+          Selamat tiket anda akan otomatis terdownload
         </p>
       </div>
     </div>

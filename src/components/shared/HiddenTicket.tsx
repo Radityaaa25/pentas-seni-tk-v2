@@ -48,6 +48,7 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                 borderRight: "3px dashed #5d4037",
               }}>
               <div style={{ position: "relative", zIndex: 1 }}>
+                {/* REQUEST 4: Ubah Teks */}
                 <p
                   style={{
                     fontSize: "14px",

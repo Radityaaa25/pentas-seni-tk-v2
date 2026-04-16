@@ -10,6 +10,7 @@ import { HiddenTicket } from "@/components/shared/HiddenTicket";
 
 export default function Home() {
   const ticketRef = useRef<HTMLDivElement>(null);
+  const hasDownloaded = useRef(false); // Flag anti download ganda
 
   const [showIntro, setShowIntro] = useState(true);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -25,9 +26,9 @@ export default function Home() {
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   const downloadTicketAsImage = useCallback(async () => {
-    if (!ticketRef.current) return;
+    if (!ticketRef.current || hasDownloaded.current) return;
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       const dataUrl = await toPng(ticketRef.current, {
         cacheBust: true,
         pixelRatio: 3,
@@ -39,17 +40,31 @@ export default function Home() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      hasDownloaded.current = true; // Tandai sudah ter-download
     } catch (err) {
       console.error("Gagal download:", err);
     }
   }, [formData.childName]);
 
+  // Auto-Download untuk Android / PC
   useEffect(() => {
     if (showSuccessPopup && finalSeats.length > 0) {
-      const timer = setTimeout(() => downloadTicketAsImage(), 1000);
+      hasDownloaded.current = false;
+      const timer = setTimeout(() => {
+        downloadTicketAsImage();
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [showSuccessPopup, finalSeats, downloadTicketAsImage]);
+
+  // Fallback / Cadangan khusus iPhone yang memblokir auto-download
+  const handleLihatPeta = async () => {
+    if (!hasDownloaded.current) {
+      await downloadTicketAsImage(); // Paksa download memakai trigger klik dari user
+    }
+    if (regId) window.location.href = `/ticket?id=${regId}`;
+  };
 
   return (
     <div
@@ -66,22 +81,26 @@ export default function Home() {
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
 
       {showSuccessPopup && (
-        <SuccessPopup finalSeats={finalSeats} regId={regId} />
-      )}
-
-      {showSuccessPopup && (
-        <HiddenTicket
-          ref={ticketRef}
-          childName={formData.childName}
-          childClass={formData.childClass}
-          seats={finalSeats}
+        <SuccessPopup
+          finalSeats={finalSeats}
           regId={regId}
-          baseUrl={baseUrl}
+          onLihatPeta={handleLihatPeta}
         />
       )}
 
+      {/* HiddenTicket ditaruh di LUAR agar iPhone sempat memuat Background.png */}
+      <HiddenTicket
+        ref={ticketRef}
+        childName={formData.childName || ""}
+        childClass={formData.childClass || ""}
+        seats={finalSeats.length > 0 ? finalSeats : ["-"]}
+        regId={regId || ""}
+        baseUrl={baseUrl}
+      />
+
       <HeaderSection isHidden={showIntro} />
 
+      {/* PERBAIKAN ERROR TYPESCRIPT ADA DI BAGIAN INI */}
       <MainAuthForm
         isHidden={showIntro}
         onSuccess={(seats, id, name, cls) => {

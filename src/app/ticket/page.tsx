@@ -69,12 +69,10 @@ function TicketContent() {
         pixelRatio: 3,
       });
       const link = document.createElement("a");
+      // REQUEST 2: Ubah Nama File
       link.download = `GOLDEN TICKET (${studentData?.child_name || "Event"}).png`;
       link.href = dataUrl;
-
-      document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
     } catch (err) {
       console.error("Gagal download:", err);
     }
