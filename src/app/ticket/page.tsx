@@ -64,12 +64,12 @@ function TicketContent() {
   const downloadUpdatedTicket = async () => {
     if (!ticketRef.current) return;
     try {
+      // FULL MURNI SEPERTI AWAL. Gak ada delay/timeout yang bikin Safari error!
       const dataUrl = await toPng(ticketRef.current, {
         cacheBust: true,
         pixelRatio: 3,
       });
       const link = document.createElement("a");
-      // REQUEST 2: Ubah Nama File
       link.download = `GOLDEN TICKET (${studentData?.child_name || "Event"}).png`;
       link.href = dataUrl;
       link.click();
@@ -150,7 +150,7 @@ function TicketContent() {
         </div>
       </div>
 
-      {/* HIDDEN TICKET (Untuk Download - Reusable Component) */}
+      {/* HIDDEN TICKET */}
       {regId && studentData && (
         <HiddenTicket
           ref={ticketRef}

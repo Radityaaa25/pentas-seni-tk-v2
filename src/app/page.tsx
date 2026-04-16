@@ -10,7 +10,7 @@ import { HiddenTicket } from "@/components/shared/HiddenTicket";
 
 export default function Home() {
   const ticketRef = useRef<HTMLDivElement>(null);
-  const hasDownloaded = useRef(false); // Flag anti download ganda
+  const hasDownloaded = useRef(false);
 
   const [showIntro, setShowIntro] = useState(true);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -28,7 +28,7 @@ export default function Home() {
   const downloadTicketAsImage = useCallback(async () => {
     if (!ticketRef.current || hasDownloaded.current) return;
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      // TIDAK ADA LAGI DELAY! Langsung hajar render agar Safari tidak ngambek.
       const dataUrl = await toPng(ticketRef.current, {
         cacheBust: true,
         pixelRatio: 3,
@@ -41,13 +41,13 @@ export default function Home() {
       link.click();
       document.body.removeChild(link);
 
-      hasDownloaded.current = true; // Tandai sudah ter-download
+      hasDownloaded.current = true;
     } catch (err) {
       console.error("Gagal download:", err);
     }
   }, [formData.childName]);
 
-  // Auto-Download untuk Android / PC
+  // Auto Download normal (Jalan mulus di Android/PC)
   useEffect(() => {
     if (showSuccessPopup && finalSeats.length > 0) {
       hasDownloaded.current = false;
@@ -58,12 +58,16 @@ export default function Home() {
     }
   }, [showSuccessPopup, finalSeats, downloadTicketAsImage]);
 
-  // Fallback / Cadangan khusus iPhone yang memblokir auto-download
-  const handleLihatPeta = async () => {
+  // Tombol penyelamat iPhone: Memaksa download menggunakan klik fisik dari user
+  const handleActionClick = async () => {
     if (!hasDownloaded.current) {
-      await downloadTicketAsImage(); // Paksa download memakai trigger klik dari user
+      await downloadTicketAsImage();
     }
-    if (regId) window.location.href = `/ticket?id=${regId}`;
+    if (regId) {
+      setTimeout(() => {
+        window.location.href = `/ticket?id=${regId}`;
+      }, 300);
+    }
   };
 
   return (
@@ -84,11 +88,13 @@ export default function Home() {
         <SuccessPopup
           finalSeats={finalSeats}
           regId={regId}
-          onLihatPeta={handleLihatPeta}
+          onAction={handleActionClick}
         />
       )}
 
-      {/* HiddenTicket ditaruh di LUAR agar iPhone sempat memuat Background.png */}
+      {/* !!! KUNCI UTAMA: HiddenTicket dipanggil DILUAR kondisi Sukses !!! 
+          Ini memaksa browser mendownload & menyimpan Background.png ke memori 
+          sejak pertama kali web dibuka. Begitu tombol submit ditekan, gambarnya PASTI ADA. */}
       <HiddenTicket
         ref={ticketRef}
         childName={formData.childName || ""}
@@ -100,7 +106,6 @@ export default function Home() {
 
       <HeaderSection isHidden={showIntro} />
 
-      {/* PERBAIKAN ERROR TYPESCRIPT ADA DI BAGIAN INI */}
       <MainAuthForm
         isHidden={showIntro}
         onSuccess={(seats, id, name, cls) => {

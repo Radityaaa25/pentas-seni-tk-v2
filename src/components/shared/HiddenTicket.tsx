@@ -1,4 +1,4 @@
-import { forwardRef, useState, useEffect } from "react";
+import { forwardRef } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
 type HiddenTicketProps = {
@@ -11,31 +11,6 @@ type HiddenTicketProps = {
 
 export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
   ({ childName, childClass, seats, regId, baseUrl }, ref) => {
-    // State untuk menyimpan gambar dalam format Data URL (Base64)
-    const [bgBase64, setBgBase64] = useState<string>("/Background.png");
-
-    useEffect(() => {
-      // Trik membobol pemblokiran render Canvas di Safari iOS
-      // Kita ubah gambar fisik menjadi teks Base64 agar langsung menempel di DOM
-      const fetchImageAsBase64 = async () => {
-        try {
-          const response = await fetch("/Background.png");
-          const blob = await response.blob();
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            if (reader.result) {
-              setBgBase64(reader.result as string); // Simpan sebagai string Base64
-            }
-          };
-          reader.readAsDataURL(blob);
-        } catch (error) {
-          console.error("Gagal memuat Base64:", error);
-        }
-      };
-
-      fetchImageAsBase64();
-    }, []);
-
     return (
       <div className="absolute -z-50 opacity-0 pointer-events-none top-0 left-0">
         <div
@@ -49,12 +24,10 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
               overflow: "hidden",
               boxShadow: "0 30px 60px rgba(0,0,0,0.5)",
               border: "4px solid #5d4037",
-              backgroundColor: "#fff8e1",
             }}>
-            {/* PERUBAHAN DISINI: src menggunakan state bgBase64, bukan lagi link teks biasa */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={bgBase64}
+              src="/Background.png"
               alt="Ticket Background"
               style={{
                 position: "absolute",
@@ -66,7 +39,6 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                 zIndex: 0,
               }}
             />
-
             <div
               style={{
                 flex: 1,
