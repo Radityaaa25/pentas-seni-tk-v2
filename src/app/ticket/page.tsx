@@ -98,10 +98,10 @@ function TicketContent() {
           <span>📍</span> Denah Lokasi
         </div>
         <h1 className="text-2xl md:text-3xl font-black text-[#3e2723] tracking-tight drop-shadow-sm">
-          TK Aisyiyah 21
+          KB-TK Aisyiyah 21 Rawamangun
         </h1>
         <p className="text-[#5d4037] font-medium text-xs md:text-sm mt-1">
-          Rawamangun • Pentas Seni 2026
+          Pentas Seni 2026
         </p>
       </div>
 

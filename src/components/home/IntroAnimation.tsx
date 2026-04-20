@@ -33,38 +33,12 @@ export const IntroAnimation = ({ onComplete }: { onComplete: () => void }) => {
 
       {introStep >= 2 && (
         <div className="flex flex-col items-center gap-4 animate-pop-in">
-          <div className="relative w-64 h-16 md:w-100 md:h-20 filter drop-shadow-md">
+          <div className="relative w-full max-w-50 md:max-w-100 filter drop-shadow-md">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/Teks1.png"
+              src="/TeksRev.png"
               alt="Pentas Seni"
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <div className="flex gap-6 items-center justify-center my-2">
-            <div className="relative w-24 h-24 md:w-32 md:h-32 filter drop-shadow-md">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/TKSD.png"
-                alt="Logo TK"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <div className="relative w-24 h-24 md:w-32 md:h-32 filter drop-shadow-md">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/LogoKomite.png"
-                alt="Logo Komite"
-                className="w-full h-full object-contain"
-              />
-            </div>
-          </div>
-          <div className="relative w-72 h-12 md:w-125 md:h-16 filter drop-shadow-md">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/Teks2.png"
-              alt="Keterangan"
-              className="w-full h-full object-contain"
+              className="w-full h-auto object-contain"
             />
           </div>
 

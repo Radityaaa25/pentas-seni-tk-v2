@@ -227,7 +227,7 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                   textAlign: "center",
                   color: "#d7ccc8",
                 }}>
-                TK AISYIYAH 21
+                KB-TK AISYIYAH 21
                 <br />
                 RAWAMANGUN
               </p>
