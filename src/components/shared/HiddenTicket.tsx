@@ -6,15 +6,16 @@ type HiddenTicketProps = {
   childClass: string;
   seats: string[];
   regId: string;
+  isHidden?: boolean;
 };
 
 export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
-  ({ childName, childClass, seats, regId }, ref) => {
+  ({ childName, childClass, seats, regId, isHidden = true }, ref) => {
     return (
       // TRIK KHUSUS IPHONE: Jangan pakai opacity-0. Sembunyikan di tumpukan paling belakang agar tetap dirender sistem
       <div
-        className="fixed top-0 left-0 pointer-events-none"
-        style={{ zIndex: -9999 }}>
+        className={isHidden ? "fixed top-0 left-0 pointer-events-none" : "relative flex justify-center w-full"}
+        style={isHidden ? { zIndex: -9999 } : {}}>
         <div
           ref={ref}
           style={{ width: "600px", padding: "20px", fontFamily: "sans-serif" }}>
@@ -110,9 +111,9 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                     style={{
                       fontSize: "32px",
                       fontWeight: 900,
-                      color: "#3e2723",
+                      color: "#ffffff",
                       textTransform: "capitalize",
-                      textShadow: "1px 1px 0 #fff",
+                      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
                     }}>
                     {childName}
                   </p>
@@ -123,10 +124,9 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                       style={{
                         fontSize: "11px",
                         fontWeight: 700,
-                        color: "#8d6e63",
+                        color: "#ffffff",
                         textTransform: "uppercase",
-                        textShadow:
-                          "2px 2px 4px rgba(0, 0, 0, 0.4), 1px 1px 0 #fff",
+                        textShadow: "2px 2px 4px rgba(0, 0, 0, 0.4)",
                       }}>
                       Class
                     </p>
@@ -134,9 +134,8 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                       style={{
                         fontSize: "20px",
                         fontWeight: 900,
-                        color: "#3e2723",
-                        textShadow:
-                          "2px 2px 4px rgba(0, 0, 0, 0.5), 1px 1px 0 #fff",
+                        color: "#ffffff",
+                        textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
                       }}>
                       {childClass}
                     </p>
@@ -146,10 +145,9 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                       style={{
                         fontSize: "11px",
                         fontWeight: 700,
-                        color: "#8d6e63",
+                        color: "#ffffff",
                         textTransform: "uppercase",
-                        textShadow:
-                          "2px 2px 4px rgba(0, 0, 0, 0.4), 1px 1px 0 #fff",
+                        textShadow: "2px 2px 4px rgba(0, 0, 0, 0.4)",
                       }}>
                       Hall
                     </p>
@@ -157,9 +155,8 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                       style={{
                         fontSize: "20px",
                         fontWeight: 900,
-                        color: "#3e2723",
-                        textShadow:
-                          "2px 2px 4px rgba(0, 0, 0, 0.5), 1px 1px 0 #fff",
+                        color: "#ffffff",
+                        textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
                       }}>
                       AUDITORIUM
                     </p>
@@ -211,7 +208,7 @@ export const HiddenTicket = forwardRef<HTMLDivElement, HiddenTicketProps>(
                 }}>
                 {regId && (
                   <QRCodeSVG
-                    value={`/ticket?id=${regId}`}
+                    value={typeof window !== 'undefined' ? `${window.location.origin}/ticket?id=${regId}` : `https://example.com/ticket?id=${regId}`}
                     size={100}
                     level={"H"}
                     fgColor="#3e2723"

@@ -68,8 +68,9 @@ export default function Home() {
         <SuccessPopup
           finalSeats={finalSeats}
           regId={regId}
-          onLihatPeta={() => (window.location.href = `/ticket?id=${regId}`)}
-          onDownload={downloadTicketAsImage}
+          childName={formData.childName || ""}
+          childClass={formData.childClass || ""}
+          onClose={() => setShowSuccessPopup(false)}
         />
       )}
 
